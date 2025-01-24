@@ -1,0 +1,12 @@
+Cc1ccc(CN2CCN(c3ccc(F)cc3)CC2)c(C)c1O	0.31
+Cc1cc(Cl)c(Cl)c(NC2CCN(CCCOc3ccc(F)c(F)c3)CC2)c1	0.93
+CC(C)Oc1ccccc1OCCN1CCC(O)(c2ccc(Cl)cc2F)CC1	0.99
+Cc1cc(C(=O)NCCCCN2CCN(c3ccccn3)CC2)ccc1C	0.96
+CC(c1ccccc1)C1CCCN(CCCCc2ccc(F)cc2)C1	0.99
+COc1ccc(NCNCCN2CCC(Cc3ccc(Cl)c(F)c3)CC2)cc1	0.93
+NCc1cc(Br)ccc1OCCCN1CCN(c2cc[nH]c2)CC1	0.96
+Cc1ccc(N2CCN(CCNC(=O)CCc3cccc(Cl)c3)CC2)cc1	0.36
+CC(C)c1ccc(CCCCCCN2CCN(c3ccc(Cl)cc3)CC2)cc1	1.0
+COc1ccc(OCCN2CCC(c3ccc(Cl)cc3)CC2)c(OC)c1	0.97
+CCNc1ccc(OCCCN2CCN(c3ccc(OC)cc3F)CC2)cc1C	0.99
+CN(C)CCc1ccccc1N1CCN(CCCCCSc2ccc(Cl)cc2Br)CC1	1.0
