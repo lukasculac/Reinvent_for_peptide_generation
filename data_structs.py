@@ -27,6 +27,7 @@ class Vocabulary(object):
 
     def encode(self, sequence):
         """Takes a peptide sequence and encodes to array of indices"""
+
         matrix = np.zeros(len(sequence), dtype=np.float32)
         for i, char in enumerate(sequence):
             matrix[i] = self.vocab[char]
@@ -35,6 +36,11 @@ class Vocabulary(object):
     def decode(self, matrix):
         """Takes an array of indices and returns the peptide seuence"""
         amino_acids = []
+
+        # Convert tensor to CPU and then to regular numbers
+        if torch.is_tensor(matrix):
+            matrix = matrix.cpu().numpy()
+
         for i in matrix:
             if i == self.vocab['EOS']: break
             amino_acids.append(self.reversed_vocab[i])
@@ -50,43 +56,50 @@ class Vocabulary(object):
     def __str__(self):
         return "Vocabulary containing {} tokens: {}".format(len(self), self.chars)
 
-class MolData(Dataset):
-    """Custom PyTorch Dataset that takes a file containing SMILES.
+class PeptideData(Dataset):
+    """Custom PyTorch Dataset for peptide sequences with labels"""
 
-        Args:
-                fname : path to a file containing \n separated SMILES.
-                voc   : a Vocabulary instance
-
-        Returns:
-                A custom PyTorch dataset for training the Prior.
-    """
     def __init__(self, fname, voc):
         self.voc = voc
-        self.smiles = []
+        self.sequences = []
+        self.labels = []
+
+        # Load peptides and labels from CSV
         with open(fname, 'r') as f:
+            next(f) #skip first row
             for line in f:
-                self.smiles.append(line.split()[0])
+                data = line.strip().split(',')
+                sequence = data[0]
+                label = int(data[1])
+                self.sequences.append(sequence)
+                self.labels.append(int(label))
 
     def __getitem__(self, i):
-        mol = self.smiles[i]
-        tokenized = self.voc.tokenize(mol)
+        """Returns a single encoded sequence and its label"""
+        sequence = self.sequences[i]
+        tokenized = self.voc.tokenize(sequence)
         encoded = self.voc.encode(tokenized)
-        return Variable(encoded)
+        return Variable(encoded), self.labels[i]
 
     def __len__(self):
-        return len(self.smiles)
+        return len(self.sequences)
 
-    def __str__(self):
-        return "Dataset containing {} structures.".format(len(self))
+
 
     @classmethod
     def collate_fn(cls, arr):
-        """Function to take a list of encoded sequences and turn them into a batch"""
-        max_length = max([seq.size(0) for seq in arr])
-        collated_arr = Variable(torch.zeros(len(arr), max_length))
-        for i, seq in enumerate(arr):
-            collated_arr[i, :seq.size(0)] = seq
-        return collated_arr
+        """Creates batches of sequences with padding"""
+        #separate sequences and labels
+        sequences = [item[0] for item in arr]
+        labels = [item[1] for item in arr]
+
+        # Pad sequences to max length in batch
+        max_length = max([seq.size(0) for seq in sequences])
+        collated_seqs = Variable(torch.zeros(len(arr), max_length))
+        for i, seq in enumerate(sequences):
+            collated_seqs[i, :seq.size(0)] = seq
+
+        return collated_seqs, torch.tensor(labels)
 
 class Experience(object):
     """Class for prioritized experience replay that remembers the highest scored sequences
