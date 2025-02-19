@@ -18,7 +18,7 @@ def pretrain(restore_from=None):
     print(f"Using device: {device}")
 
     # Read vocabulary from a file
-    voc = Vocabulary(init_from_file="data/Voc")
+    voc = Vocabulary(init_from_file="data/Voc_peptides")
 
     # Create a Dataset from a SMILES file
     moldata = MolData("data/mols_filtered.smi", voc)
